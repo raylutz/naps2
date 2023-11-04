@@ -48,7 +48,6 @@ public class BatchScanForm : EtoDialogBase
     private readonly RadioButton _filePerScan;
     private readonly RadioButton _filePerPage;
     private readonly RadioButton _separateByPatchT;
-    // Barcode features
     private readonly RadioButton _separatorSheetNewBatch;
     private readonly RadioButton _includeSeparatorSheet;
     private readonly RadioButton _useBarcodePlaceholder;
@@ -85,7 +84,6 @@ public class BatchScanForm : EtoDialogBase
         _filePerScan = new RadioButton { Text = UiStrings.OneFilePerScan };
         _filePerPage = new RadioButton(_filePerScan) { Text = UiStrings.OneFilePerPage };
         _separateByPatchT = new RadioButton(_filePerScan) { Text = UiStrings.SeparateByPatchT };
-        // New features
         _separatorSheetNewBatch = new RadioButton() { Text = UiStrings.SeparatorSheetNewBatch };
         _includeSeparatorSheet = new RadioButton() { Text = UiStrings.IncludeSeparatorSheet };
         _useBarcodePlaceholder = new RadioButton() { Text = UiStrings.UseBarcodePlaceholder };
@@ -95,7 +93,7 @@ public class BatchScanForm : EtoDialogBase
         _eraseBatchOnError = new RadioButton() { Text = UiStrings.EraseBatchOnError };
         _useBatchAsFolderName = new RadioButton() { Text = UiStrings.UseBatchAsFolderName };
         _createPatchTLog = new RadioButton() { Text = UiStrings.CreatePatchTLog };
-        _stagingFolderPath = new(this, dialogHelper);
+        _stagingFolderPath = new(dialogHelper);
         _filePath = new(this, dialogHelper);
 
         _start.Click += Start;
@@ -241,6 +239,15 @@ public class BatchScanForm : EtoDialogBase
         _filePerPage.Checked = _transactionConfig.Get(c => c.BatchSettings.SaveSeparator) == SaveSeparator.FilePerPage;
         _separateByPatchT.Checked = _transactionConfig.Get(c => c.BatchSettings.SaveSeparator) == SaveSeparator.PatchT;
         // New features
+        _separatorSheetNewBatch.Checked = _transactionConfig.Get(c => c.PatchTSettings.SeparatorSheetStartsNewBatch) == true;
+        _includeSeparatorSheet.Checked = _transactionConfig.Get(c => c.PatchTSettings.IncludeSeparatorInBatch) == true;
+        _useBarcodePlaceholder.Checked = _transactionConfig.Get(c => c.PatchTSettings.UseBarcodeAsPlaceholder) == true;
+        _restartSheetsNumbering.Checked = _transactionConfig.Get(c => c.PatchTSettings.RestartSheetsNumberingPerBatch) == true;
+        _restartBatchOnError.Checked = _transactionConfig.Get(c => c.PatchTSettings.RestartBatchOnError) == true;
+        _copyToStagingFolder.Checked = _transactionConfig.Get(c => c.PatchTSettings.CopyScansToStagingFolder) == true;
+        _eraseBatchOnError.Checked = _transactionConfig.Get(c => c.PatchTSettings.EraseBatchOnError) == true;
+        _useBatchAsFolderName.Checked = _transactionConfig.Get(c => c.PatchTSettings.UseBatchAsFolderName) == true;
+        _createPatchTLog.Checked = _transactionConfig.Get(c => c.PatchTSettings.CreatePatchTLog) == true;
 
         _filePath.Text = _transactionConfig.Get(c => c.BatchSettings.SavePath);
     }
@@ -288,6 +295,17 @@ public class BatchScanForm : EtoDialogBase
         _userTransact.Set(c => c.BatchSettings.SaveSeparator, _filePerScan.Checked ? SaveSeparator.FilePerScan
             : _separateByPatchT.Checked ? SaveSeparator.PatchT
             : SaveSeparator.FilePerPage);
+
+        // New features
+        _userTransact.Set(c => c.PatchTSettings.SeparatorSheetStartsNewBatch, _separateByPatchT.Checked ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.IncludeSeparatorInBatch, _includeSeparatorSheet.Checked ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.UseBarcodeAsPlaceholder, _useBarcodePlaceholder.Checked ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.RestartSheetsNumberingPerBatch, _restartSheetsNumbering.Checked ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.RestartBatchOnError, _restartBatchOnError.Checked ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.CopyScansToStagingFolder, _copyToStagingFolder.Checked ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.EraseBatchOnError, _eraseBatchOnError.Checked ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.UseBatchAsFolderName, _useBatchAsFolderName.Checked ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.CreatePatchTLog, _createPatchTLog.Checked ? true : false);
 
         _userTransact.Set(c => c.BatchSettings.SavePath, _filePath.Text);
         if (_transactionConfig.Get(c => c.BatchSettings.OutputType) != BatchOutputType.Load &&
@@ -409,7 +427,8 @@ public class BatchScanForm : EtoDialogBase
     {
         try
         {
-            await _batchScanPerformer.PerformBatchScan(_transactionConfig.Get(c => c.BatchSettings), this,
+            await _batchScanPerformer.PerformBatchScan(_transactionConfig.Get(c => c.BatchSettings),
+                _transactionConfig.Get(c => c.PatchTSettings), this,
                 image => Invoker.Current.Invoke(() => ImageCallback(image)), ProgressCallback, _cts.Token);
             Invoker.Current.Invoke(() =>
             {

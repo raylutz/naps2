@@ -6,16 +6,14 @@ namespace NAPS2.EtoForms.Widgets
 {
     public class FolderPath
     {
-        private readonly IFormBase _form;
         private readonly DialogHelper? _dialogHelper;
 
         private readonly TextBox _path = new();
         private readonly Button _choose = new() { Text = UiStrings.Ellipsis };
         private LayoutVisibility? _visibility;
 
-        public FolderPath(IFormBase form, DialogHelper? dialogHelper) 
+        public FolderPath(DialogHelper? dialogHelper) 
         {
-            _form = form;
             _dialogHelper = dialogHelper;
             _choose.Click += OpenPathDialog;
             _path.TextChanged += (_, _) => TextChanged?.Invoke(this, EventArgs.Empty);

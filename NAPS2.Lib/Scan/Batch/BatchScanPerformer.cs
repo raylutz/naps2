@@ -33,11 +33,11 @@ public class BatchScanPerformer : IBatchScanPerformer
         _thumbnailController = thumbnailController;
     }
 
-    public async Task PerformBatchScan(BatchSettings settings, IFormBase batchForm,
+    public async Task PerformBatchScan(BatchSettings settings, PatchTSettings patchTSettings, IFormBase batchForm,
         Action<ProcessedImage> imageCallback, Action<string> progressCallback, CancellationToken cancelToken)
     {
         var state = new BatchState(_scanPerformer, _pdfExporter, _operationFactory, _formFactory, _config,
-            _profileManager, _thumbnailController, settings, progressCallback, cancelToken, batchForm, imageCallback);
+            _profileManager, _thumbnailController, settings, patchTSettings, progressCallback, cancelToken, batchForm, imageCallback);
         await state.Do();
     }
 
@@ -51,6 +51,7 @@ public class BatchScanPerformer : IBatchScanPerformer
         private readonly IProfileManager _profileManager;
 
         private readonly BatchSettings _settings;
+        private readonly PatchTSettings _patchTSettings;
         private readonly Action<string> _progressCallback;
         private readonly CancellationToken _cancelToken;
         private readonly IFormBase _batchForm;
@@ -62,7 +63,7 @@ public class BatchScanPerformer : IBatchScanPerformer
 
         public BatchState(IScanPerformer scanPerformer, IPdfExporter pdfExporter, IOperationFactory operationFactory,
             IFormFactory formFactory, Naps2Config config, IProfileManager profileManager,
-            ThumbnailController thumbnailController, BatchSettings settings,
+            ThumbnailController thumbnailController, BatchSettings settings, PatchTSettings patchTSettings,
             Action<string> progressCallback, CancellationToken cancelToken, IFormBase batchForm,
             Action<ProcessedImage> loadImageCallback)
         {
@@ -73,6 +74,7 @@ public class BatchScanPerformer : IBatchScanPerformer
             _config = config;
             _profileManager = profileManager;
             _settings = settings;
+            _patchTSettings = patchTSettings;
             _progressCallback = progressCallback;
             _cancelToken = cancelToken;
             _batchForm = batchForm;
@@ -267,6 +269,12 @@ public class BatchScanPerformer : IBatchScanPerformer
                 return;
             }
             var subPath = placeholders.Substitute(_settings.SavePath!, true, i);
+            if (_patchTSettings.SeparatorSheetStartsNewBatch)
+            {
+                var dirPath = _settings.SavePath!.Substring(0, _settings.SavePath.Length - _settings.SavePath.Substring(_settings.SavePath.LastIndexOf("\\")).Length);
+                Directory.CreateDirectory(dirPath + $"\\images{i+1}");
+                subPath = subPath.Insert(subPath.LastIndexOf("\\"), $"\\images{i+1}");
+            }
             if (GetSavePathExtension().ToLower() == ".pdf")
             {
                 if (File.Exists(subPath))
