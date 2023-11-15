@@ -30,6 +30,7 @@ internal static class BarcodeDetector
              Options = zxingOptions
         };
         var result = reader.Decode(image);
+        
         return new Barcode(true, result != null, result?.Text);
     }
     

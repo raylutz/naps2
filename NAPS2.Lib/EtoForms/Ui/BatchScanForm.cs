@@ -48,19 +48,19 @@ public class BatchScanForm : EtoDialogBase
     private readonly RadioButton _filePerScan;
     private readonly RadioButton _filePerPage;
     private readonly RadioButton _separateByPatchT;
-    private readonly RadioButton _separatorSheetNewBatch;
-    private readonly RadioButton _includeSeparatorSheet;
-    private readonly RadioButton _useBarcodePlaceholder;
-    private readonly RadioButton _restartSheetsNumbering;
-    private readonly RadioButton _restartBatchOnError;
-    private readonly RadioButton _copyToStagingFolder;
-    private readonly RadioButton _eraseBatchOnError;
-    private readonly RadioButton _useBatchAsFolderName;
-    private readonly RadioButton _createPatchTLog;
+    private readonly CheckBox _separatorSheetNewBatch;
+    private readonly CheckBox _includeSeparatorSheet;
+    private readonly CheckBox _useBarcodePlaceholder;
+    private readonly CheckBox _restartSheetsNumbering;
+    private readonly CheckBox _restartBatchOnError;
+    private readonly CheckBox _copyToStagingFolder;
+    private readonly CheckBox _eraseBatchOnError;
+    private readonly CheckBox _useBatchAsFolderName;
+    private readonly CheckBox _createBatchLog;
     private readonly LinkButton _moreInfo = C.UrlLink(PATCH_CODE_INFO_URL, UiStrings.MoreInfo);
     private readonly LayoutVisibility _stagingFolderPathVis = new(false);
     private readonly LayoutVisibility _fileVis = new(false);
-    private readonly FolderPath _stagingFolderPath;
+    private readonly StagingFolderPath _stagingFolderPath;
     private readonly FilePathWithPlaceholders _filePath;
 
     private readonly TransactionConfigScope<CommonConfig> _userTransact;
@@ -83,16 +83,16 @@ public class BatchScanForm : EtoDialogBase
         _saveToMultipleFiles = new RadioButton(_load) { Text = UiStrings.SaveToMultipleFiles };
         _filePerScan = new RadioButton { Text = UiStrings.OneFilePerScan };
         _filePerPage = new RadioButton(_filePerScan) { Text = UiStrings.OneFilePerPage };
-        _separateByPatchT = new RadioButton(_filePerScan) { Text = UiStrings.SeparateByPatchT };
-        _separatorSheetNewBatch = new RadioButton() { Text = UiStrings.SeparatorSheetNewBatch };
-        _includeSeparatorSheet = new RadioButton() { Text = UiStrings.IncludeSeparatorSheet };
-        _useBarcodePlaceholder = new RadioButton() { Text = UiStrings.UseBarcodePlaceholder };
-        _restartSheetsNumbering = new RadioButton() { Text = UiStrings.RestartSheetsNumbering };
-        _restartBatchOnError = new RadioButton() { Text = UiStrings.RestartBatchOnError };
-        _copyToStagingFolder = new RadioButton() { Text = UiStrings.CopyToStagingFolder };
-        _eraseBatchOnError = new RadioButton() { Text = UiStrings.EraseBatchOnError };
-        _useBatchAsFolderName = new RadioButton() { Text = UiStrings.UseBatchAsFolderName };
-        _createPatchTLog = new RadioButton() { Text = UiStrings.CreatePatchTLog };
+        _separateByPatchT = new RadioButton(_filePerScan) { Text = UiStrings.SeparateByPatchT, Checked = true };
+        _separatorSheetNewBatch = new CheckBox() { Text = UiStrings.SeparatorSheetNewBatch };
+        _includeSeparatorSheet = new CheckBox() { Text = UiStrings.IncludeSeparatorSheet };
+        _useBarcodePlaceholder = new CheckBox() { Text = UiStrings.UseBarcodePlaceholder };
+        _restartSheetsNumbering = new CheckBox() { Text = UiStrings.RestartSheetsNumbering };
+        _restartBatchOnError = new CheckBox() { Text = UiStrings.RestartBatchOnError, Checked = true };
+        _copyToStagingFolder = new CheckBox() { Text = UiStrings.CopyToStagingFolder, Checked = true };
+        _eraseBatchOnError = new CheckBox() { Text = UiStrings.EraseBatchOnError };
+        _useBatchAsFolderName = new CheckBox() { Text = UiStrings.UseBatchAsFolderName };
+        _createBatchLog = new CheckBox() { Text = UiStrings.CreatePatchTLog };
         _stagingFolderPath = new(dialogHelper);
         _filePath = new(this, dialogHelper);
 
@@ -113,15 +113,16 @@ public class BatchScanForm : EtoDialogBase
         NewProfileCommand = new ActionCommand(NewProfile) { Image = Icons.add_small.ToEtoImage() };
     }
 
+
     private void UpdateVisibility(object? sender, EventArgs e)
     {
-        _copyToStagingFolderVis.IsVisible = _copyToStagingFolder.Checked;
-        _restartBatchOnErrorVis.IsVisible = _restartBatchOnError.Checked;
-        _separatorSheetNewBatchVis.IsVisible = _separatorSheetNewBatch.Checked;
+        _copyToStagingFolderVis.IsVisible = (bool)_copyToStagingFolder.Checked!;
+        _restartBatchOnErrorVis.IsVisible = (bool)_restartBatchOnError.Checked!;
+        _separatorSheetNewBatchVis.IsVisible = (bool)_separatorSheetNewBatch.Checked!;
         _patchTVis.IsVisible = _separateByPatchT.Checked;
         _delayVis.IsVisible = _multipleScansDelay.Checked;
         _multiVis.IsVisible = _saveToMultipleFiles.Checked;
-        _stagingFolderPathVis.IsVisible = _copyToStagingFolder.Checked;
+        _stagingFolderPathVis.IsVisible = (bool)_copyToStagingFolder.Checked!;
         _fileVis.IsVisible = _saveToSingleFile.Checked || _saveToMultipleFiles.Checked;
         LayoutController.Invalidate();
     }
@@ -182,24 +183,23 @@ public class BatchScanForm : EtoDialogBase
                         _filePerPage,
                         _separateByPatchT,
                         L.Column(
-                            // New features
                             _separatorSheetNewBatch,
                             L.Column (
-                                _includeSeparatorSheet
-                            ).Padding(left: 20).Visible(_separatorSheetNewBatchVis),
-                            _useBarcodePlaceholder,
-                            _restartSheetsNumbering,
-                            _restartBatchOnError,
-                            L.Column (
-                                _copyToStagingFolder,
-                                L.Column(
-                                    _eraseBatchOnError,
-                                    C.Label(UiStrings.StagingFolderLabel),
-                                    _stagingFolderPath
-                                ).Padding(left: 20).Visible(_copyToStagingFolderVis)
-                            ).Padding(left: 20).Visible(_restartBatchOnErrorVis),
-                            _useBatchAsFolderName,
-                            _createPatchTLog
+                                _includeSeparatorSheet,
+                                _useBatchAsFolderName,
+                                _restartSheetsNumbering,
+                                _restartBatchOnError,
+                                    L.Column(
+                                     _copyToStagingFolder,
+                                      L.Column(
+                                        _eraseBatchOnError,
+                                        C.Label(UiStrings.StagingFolderLabel),
+                                        _stagingFolderPath
+                                    ).Padding(left: 20).Visible(_copyToStagingFolderVis)
+                                ).Padding(left: 20).Visible(_restartBatchOnErrorVis),
+                                _useBarcodePlaceholder,
+                                _createBatchLog
+                            ).Padding(left: 20).Visible(_separatorSheetNewBatchVis)
                         ).Padding(left: 20).Visible(_patchTVis),
                         _moreInfo
                     ).Padding(left: 20).Visible(_multiVis),
@@ -238,7 +238,6 @@ public class BatchScanForm : EtoDialogBase
         _filePerScan.Checked = _transactionConfig.Get(c => c.BatchSettings.SaveSeparator) == SaveSeparator.FilePerScan;
         _filePerPage.Checked = _transactionConfig.Get(c => c.BatchSettings.SaveSeparator) == SaveSeparator.FilePerPage;
         _separateByPatchT.Checked = _transactionConfig.Get(c => c.BatchSettings.SaveSeparator) == SaveSeparator.PatchT;
-        // New features
         _separatorSheetNewBatch.Checked = _transactionConfig.Get(c => c.PatchTSettings.SeparatorSheetStartsNewBatch) == true;
         _includeSeparatorSheet.Checked = _transactionConfig.Get(c => c.PatchTSettings.IncludeSeparatorInBatch) == true;
         _useBarcodePlaceholder.Checked = _transactionConfig.Get(c => c.PatchTSettings.UseBarcodeAsPlaceholder) == true;
@@ -247,7 +246,7 @@ public class BatchScanForm : EtoDialogBase
         _copyToStagingFolder.Checked = _transactionConfig.Get(c => c.PatchTSettings.CopyScansToStagingFolder) == true;
         _eraseBatchOnError.Checked = _transactionConfig.Get(c => c.PatchTSettings.EraseBatchOnError) == true;
         _useBatchAsFolderName.Checked = _transactionConfig.Get(c => c.PatchTSettings.UseBatchAsFolderName) == true;
-        _createPatchTLog.Checked = _transactionConfig.Get(c => c.PatchTSettings.CreatePatchTLog) == true;
+        _createBatchLog.Checked = _transactionConfig.Get(c => c.PatchTSettings.CreatePatchTLog) == true;
 
         _filePath.Text = _transactionConfig.Get(c => c.BatchSettings.SavePath);
     }
@@ -297,15 +296,18 @@ public class BatchScanForm : EtoDialogBase
             : SaveSeparator.FilePerPage);
 
         // New features
+        _userTransact.Set(c => c.ImageSettings.SinglePageTiff, _separateByPatchT.Checked ? true : false);
+
         _userTransact.Set(c => c.PatchTSettings.SeparatorSheetStartsNewBatch, _separateByPatchT.Checked ? true : false);
-        _userTransact.Set(c => c.PatchTSettings.IncludeSeparatorInBatch, _includeSeparatorSheet.Checked ? true : false);
-        _userTransact.Set(c => c.PatchTSettings.UseBarcodeAsPlaceholder, _useBarcodePlaceholder.Checked ? true : false);
-        _userTransact.Set(c => c.PatchTSettings.RestartSheetsNumberingPerBatch, _restartSheetsNumbering.Checked ? true : false);
-        _userTransact.Set(c => c.PatchTSettings.RestartBatchOnError, _restartBatchOnError.Checked ? true : false);
-        _userTransact.Set(c => c.PatchTSettings.CopyScansToStagingFolder, _copyToStagingFolder.Checked ? true : false);
-        _userTransact.Set(c => c.PatchTSettings.EraseBatchOnError, _eraseBatchOnError.Checked ? true : false);
-        _userTransact.Set(c => c.PatchTSettings.UseBatchAsFolderName, _useBatchAsFolderName.Checked ? true : false);
-        _userTransact.Set(c => c.PatchTSettings.CreatePatchTLog, _createPatchTLog.Checked ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.IncludeSeparatorInBatch, (bool)_includeSeparatorSheet.Checked! ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.UseBarcodeAsPlaceholder, (bool)_useBarcodePlaceholder.Checked! ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.RestartSheetsNumberingPerBatch, (bool)_restartSheetsNumbering.Checked! ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.RestartBatchOnError, (bool)_restartBatchOnError.Checked! ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.CopyScansToStagingFolder, (bool)_copyToStagingFolder.Checked! ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.EraseBatchOnError, (bool)_eraseBatchOnError.Checked! ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.UseBatchAsFolderName, (bool)_useBatchAsFolderName.Checked! ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.CreatePatchTLog, (bool)_createBatchLog.Checked! ? true : false);
+        _userTransact.Set(c => c.PatchTSettings.StagingFolderName, _stagingFolderPath.Text);
 
         _userTransact.Set(c => c.BatchSettings.SavePath, _filePath.Text);
         if (_transactionConfig.Get(c => c.BatchSettings.OutputType) != BatchOutputType.Load &&
@@ -412,7 +414,9 @@ public class BatchScanForm : EtoDialogBase
         {
             _profile, _singleScan, _multipleScansPrompt, _multipleScansDelay, _numberOfScans,
             _timeBetweenScans, _load, _saveToSingleFile, _saveToMultipleFiles, _filePerScan, _filePerPage,
-            _separateByPatchT, _moreInfo
+            _separateByPatchT, _separatorSheetNewBatch, _includeSeparatorSheet, _useBarcodePlaceholder,
+            _restartSheetsNumbering, _restartBatchOnError, _copyToStagingFolder, _eraseBatchOnError,
+            _useBatchAsFolderName, _createBatchLog, _moreInfo
         };
         foreach (var control in controls)
         {

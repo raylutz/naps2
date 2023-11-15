@@ -69,7 +69,7 @@ internal class ScanPerformer : IScanPerformer
         controller.ScanError += (sender, args) => HandleError(args.Exception);
         controller.PropagateErrors = false;
         TranslateProgress(controller, op);
-
+        
         ShowOperation(op, options, scanParams);
         cancelToken.Register(op.Cancel);
 

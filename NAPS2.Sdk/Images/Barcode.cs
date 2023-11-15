@@ -14,5 +14,5 @@ public record Barcode(bool IsDetectionAttempted, bool IsDetected, string? Detect
     {
     }
 
-    public bool IsPatchT => DetectedText == PATCH_T_TEXT;
+    public bool IsPatchT => DetectedText != null;
 }

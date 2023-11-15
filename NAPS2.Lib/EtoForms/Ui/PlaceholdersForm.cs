@@ -19,7 +19,7 @@ public class PlaceholdersForm : EtoDialogBase
             (Placeholders.NUMBER_3_DIGITS, UiStrings.AutoIncrementing3Digit),
             (Placeholders.NUMBER_2_DIGITS, UiStrings.AutoIncrementing2Digit),
             (Placeholders.NUMBER_1_DIGIT, UiStrings.AutoIncrementing1Digit),
-            (Placeholders.PATCH_T, UiStrings.PatchTInfo)
+            (Placeholders.BARCODE, UiStrings.BarcodeInfo)
         };
 
     private readonly TextBox _fileName = new();
@@ -29,6 +29,7 @@ public class PlaceholdersForm : EtoDialogBase
     {
         // TODO: Ellipsis aren't working, presumably because Eto uses custom label rendering on WinForms
         EtoPlatform.Current.ConfigureEllipsis(_preview);
+
         _fileName.TextChanged += FileName_TextChanged;
     }
 
@@ -90,7 +91,6 @@ public class PlaceholdersForm : EtoDialogBase
     private void FileName_TextChanged(object? sender, EventArgs e)
     {
         _preview.Text = Placeholders.All.Substitute(_fileName.Text, false);
-        
     }
 
 }

@@ -22,7 +22,7 @@ internal abstract class Placeholders
     public const string NUMBER_1_DIGIT = "$(n)";
     public const string FULL_DATE = "$(YYYY)-$(MM)-$(DD)";
     public const string FULL_TIME = "$(hh)_$(mm)_$(ss)";
-    public const string PATCH_T = "$(PatchT)";
+    public const string BARCODE = "$(barcode)";
 
     /// <summary>
     /// Substitutes all the standard placeholders. For example, "$(YYYY)-$(MM)-$(DD) $(hh):$(mm):$(ss)" is substituted with the current date and time. Substitutes environment variables. Handles auto-numbering for multiple files,
@@ -114,6 +114,8 @@ internal abstract class Placeholders
             result = Replacements.Aggregate(result, (current, ph) => current.Replace(ph.Key, ph.Value(dateTime)));
             // One does, however
             var match = NumberPlaceholderPattern.Match(result);
+
+            result = SubstituteBarcode(filePath, "PatchT");
             if (match.Success)
             {
                 result = NumberPlaceholderPattern.Replace(result, "");
@@ -143,13 +145,9 @@ internal abstract class Placeholders
             return result;
         }
 
-        private string SubstitutePatchTNumber(string path) 
+        private string SubstituteBarcode(string path, string barcodeName) 
         {
-            string result;
-
-
-
-            return "";
+            return path.Replace("$(barcode)", barcodeName);
         }
     }
 }

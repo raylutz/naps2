@@ -286,6 +286,24 @@ namespace NAPS2.Lang.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Barcode from the separator sheet.
+        /// </summary>
+        internal static string BarcodeInfo {
+            get {
+                return ResourceManager.GetString("BarcodeInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Batch name:.
+        /// </summary>
+        internal static string BatchNameLabel {
+            get {
+                return ResourceManager.GetString("BatchNameLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Next Scan.
         /// </summary>
         internal static string BatchPromptFormTitle {
@@ -543,6 +561,15 @@ namespace NAPS2.Lang.Resources {
         internal static string Default {
             get {
                 return ResourceManager.GetString("Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to images.
+        /// </summary>
+        internal static string DefaultBatchName {
+            get {
+                return ResourceManager.GetString("DefaultBatchName", resourceCulture);
             }
         }
         
@@ -1159,7 +1186,7 @@ namespace NAPS2.Lang.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NAPS2.
+        ///   Looks up a localized string similar to ScanEngine.
         /// </summary>
         internal static string Naps2 {
             get {
@@ -1168,7 +1195,7 @@ namespace NAPS2.Lang.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Not Another PDF Scanner.
+        ///   Looks up a localized string similar to ScanEngine.
         /// </summary>
         internal static string Naps2FullName {
             get {
@@ -1177,7 +1204,7 @@ namespace NAPS2.Lang.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NAPS2 - {0}.
+        ///   Looks up a localized string similar to ScanEngine - {0}.
         /// </summary>
         internal static string Naps2TitleFormat {
             get {
@@ -1389,15 +1416,6 @@ namespace NAPS2.Lang.Resources {
         internal static string Paste {
             get {
                 return ResourceManager.GetString("Paste", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Information from Patch T.
-        /// </summary>
-        internal static string PatchTInfo {
-            get {
-                return ResourceManager.GetString("PatchTInfo", resourceCulture);
             }
         }
         

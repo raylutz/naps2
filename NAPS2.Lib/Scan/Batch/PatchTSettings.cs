@@ -4,6 +4,12 @@ namespace NAPS2.Scan.Batch
 {
     public class PatchTSettings
     {
+        public string BatchName { get; set; } = UiStrings.DefaultBatchName;
+
+        public string ?BarcodeName {get; set;}
+
+        public string ?StagingFolderName { get; set; }
+
         public bool SeparatorSheetStartsNewBatch { get; set; }
 
         public bool IncludeSeparatorInBatch { get; set; }

@@ -16,6 +16,8 @@ internal class SaveImagesOperation : OperationBase
     }
 
     public string? FirstFileSaved { get; private set; }
+    private bool _destFolder = false;
+    private bool _isBatchLog = false;
 
     /// <summary>
     /// Saves the provided collection of images to a file with the given name. The image type is inferred from the file extension.
@@ -28,8 +30,10 @@ internal class SaveImagesOperation : OperationBase
     /// <param name="batch"></param>
     /// <param name="imageSettings"></param>
     public bool Start(string fileName, Placeholders placeholders, IList<ProcessedImage> images,
-        ImageSettings imageSettings, string? overwriteFile = null, bool batch = false)
+        ImageSettings imageSettings, string? overwriteFile = null, bool batch = false, bool destFolder = false, bool batchLog = false, int i = 0)
     {
+        _destFolder = destFolder;
+        _isBatchLog = batchLog;
         Status = new OperationStatus
         {
             MaxProgress = images.Count
@@ -75,7 +79,7 @@ internal class SaveImagesOperation : OperationBase
                         imageSettings.TiffCompression.ToTiffCompressionType(), ProgressHandler);
                 }
 
-                int i = 0;
+                //int i = 0;
                 int digits = (int) Math.Floor(Math.Log10(images.Count)) + 1;
                 foreach (ProcessedImage image in images)
                 {
@@ -163,8 +167,21 @@ internal class SaveImagesOperation : OperationBase
         using var renderedImage = image.Render();
         if (format == ImageFileFormat.Tiff)
         {
-            _imageContext.TiffWriter.SaveTiff(new[] { renderedImage }, path,
+            bool status = _imageContext.TiffWriter.SaveTiff(new[] { renderedImage }, path,
                 imageSettings.TiffCompression.ToTiffCompressionType(), CancelToken);
+            if (_isBatchLog)
+            {
+                if (!_destFolder)
+                {
+                    if (status)
+                        Log.Info($": Ballot {path.Substring(path.LastIndexOf("\\") + 1)}: {status}");
+                    else
+                    {
+                        Log.Info($": Ballot {path.Substring(path.LastIndexOf("\\") + 1)}:        - Problem Ballot - Skipped");
+                        Log.Info($"Stopped on ballot {path.Substring(path.LastIndexOf("\\") + 1)}. Ballot misread.");
+                    }
+                }
+            }
         }
         else
         {

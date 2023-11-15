@@ -1,10 +1,9 @@
 ﻿using Eto.Forms;
 using NAPS2.EtoForms.Layout;
-using NAPS2.EtoForms.Ui;
 
 namespace NAPS2.EtoForms.Widgets
 {
-    public class FolderPath
+    public class StagingFolderPath
     {
         private readonly DialogHelper? _dialogHelper;
 
@@ -12,7 +11,7 @@ namespace NAPS2.EtoForms.Widgets
         private readonly Button _choose = new() { Text = UiStrings.Ellipsis };
         private LayoutVisibility? _visibility;
 
-        public FolderPath(DialogHelper? dialogHelper) 
+        public StagingFolderPath(DialogHelper? dialogHelper) 
         {
             _dialogHelper = dialogHelper;
             _choose.Click += OpenPathDialog;
@@ -27,7 +26,7 @@ namespace NAPS2.EtoForms.Widgets
 
         public event EventHandler? TextChanged;
 
-        public static implicit operator LayoutElement(FolderPath control)
+        public static implicit operator LayoutElement(StagingFolderPath control)
         {
             return control.AsControl();
         }
@@ -47,13 +46,14 @@ namespace NAPS2.EtoForms.Widgets
         private void OpenPathDialog(object? sender, EventArgs e)
         {
             string savePath;
+
             if (_dialogHelper!.PromptToSelectFolder(_path.Text, out savePath!) == true)
             {
                 _path.Text = savePath;
             }
         }
 
-        public FolderPath Visible(LayoutVisibility visibility)
+        public StagingFolderPath Visible(LayoutVisibility visibility)
         {
             _visibility = visibility;
             return this;

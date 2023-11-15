@@ -1,4 +1,6 @@
-﻿namespace NAPS2.ImportExport;
+﻿using NAPS2.Scan.Batch;
+
+namespace NAPS2.ImportExport;
 
 internal static class SaveSeparatorHelper
 {
@@ -10,7 +12,7 @@ internal static class SaveSeparatorHelper
     /// <param name="separator"></param>
     /// <param name="splitSize"></param>
     /// <returns></returns>
-    public static IEnumerable<List<ProcessedImage>> SeparateScans(IEnumerable<IEnumerable<ProcessedImage>> scans, SaveSeparator separator, int splitSize = 1)
+    public static IEnumerable<List<ProcessedImage>> SeparateScans(IEnumerable<IEnumerable<ProcessedImage>> scans, SaveSeparator separator, int splitSize = 1, Naps2Config config = null)
     {
         if (separator == SaveSeparator.FilePerScan)
         {
@@ -41,14 +43,25 @@ internal static class SaveSeparatorHelper
             {
                 foreach (var image in scan)
                 {
+                    bool isIncluded = config != null ? 
+                        config.Get(c => c.PatchTSettings.IncludeSeparatorInBatch) : false;
+                    if (config != null && config.Get(c => c.PatchTSettings.UseBarcodeAsPlaceholder))
+                    {
+                        if (image.PostProcessingData.Barcode.DetectedText != null)
+                            config.User.Set(c => c.PatchTSettings.BarcodeName, image.PostProcessingData.Barcode.DetectedText);
+                    }
+
                     if (image.PostProcessingData.Barcode.IsPatchT)
                     {
-                        image.Dispose();
                         if (images.Count > 0)
                         {
                             yield return images;
                             images = new List<ProcessedImage>();
                         }
+                        if (isIncluded)
+                            images.Add(image);
+                        else
+                            image.Dispose();
                     }
                     else
                     {

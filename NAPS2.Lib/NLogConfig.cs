@@ -29,9 +29,18 @@ public static class NLogConfig
             ArchiveAboveSize = 100000,
             MaxArchiveFiles = 1
         };
-        config.AddTarget("errorlogfile", target);
+        var batchTarget = new FileTarget
+        {
+            FileName = Path.Combine(Paths.AppData, "batchlog.txt"),
+            Layout = "${longdate} ${processid} ${message} ${exception:format=tostring}",
+            ArchiveAboveSize = 100000,
+            MaxArchiveFiles = 1
+        };
+       // config.AddTarget("errorlogfile", target);
         config.AddTarget("debuglogfile", debugTarget);
-        config.LoggingRules.Add(new LoggingRule("*", LogLevel.Info, target));
+        config.AddTarget("batchlogfile", batchTarget);
+        config.LoggingRules.Add(new LoggingRule("*", LogLevel.Error, target));
+        config.LoggingRules.Add(new LoggingRule("*", LogLevel.Info, batchTarget));
         var debugRule = new LoggingRule("*", LogLevel.Debug, debugTarget);
         debugRule.Filters.Add(new WhenMethodFilter(_ => enableDebugLogging() ? FilterResult.Log : FilterResult.Ignore));
         config.LoggingRules.Add(debugRule);

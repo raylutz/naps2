@@ -424,13 +424,13 @@
     <value>Run in Background</value>
   </data>
   <data name="Naps2" xml:space="preserve">
-    <value>NAPS2</value>
+    <value>ScanEngine</value>
   </data>
   <data name="Naps2TitleFormat" xml:space="preserve">
-    <value>NAPS2 - {0}</value>
+    <value>ScanEngine - {0}</value>
   </data>
   <data name="Naps2FullName" xml:space="preserve">
-    <value>Not Another PDF Scanner</value>
+    <value>ScanEngine</value>
   </data>
   <data name="OcrSetupFormTitle" xml:space="preserve">
     <value>OCR Setup</value>
@@ -810,8 +810,8 @@
   <data name="EnableDebugLogging" xml:space="preserve">
     <value>Enable debug logging</value>
   </data>
-  <data name="PatchTInfo" xml:space="preserve">
-    <value>Information from Patch T</value>
+  <data name="BarcodeInfo" xml:space="preserve">
+    <value>Barcode from the separator sheet</value>
   </data>
   <data name="CopyToStagingFolder" xml:space="preserve">
     <value>Copy scans to the staging folder</value>
@@ -842,5 +842,11 @@
   </data>
   <data name="StagingFolderLabel" xml:space="preserve">
     <value>Staging Folder:</value>
+  </data>
+  <data name="BatchNameLabel" xml:space="preserve">
+    <value>Batch name:</value>
+  </data>
+  <data name="DefaultBatchName" xml:space="preserve">
+    <value>images</value>
   </data>
 </root>
