@@ -79,7 +79,6 @@ internal class SaveImagesOperation : OperationBase
                         imageSettings.TiffCompression.ToTiffCompressionType(), ProgressHandler);
                 }
 
-                //int i = 0;
                 int digits = (int) Math.Floor(Math.Log10(images.Count)) + 1;
                 foreach (ProcessedImage image in images)
                 {
@@ -160,7 +159,7 @@ internal class SaveImagesOperation : OperationBase
 
         return true;
     }
-
+    
     private void DoSaveImage(ProcessedImage image, string path, ImageFileFormat format, ImageSettings imageSettings)
     {
         FileSystemHelper.EnsureParentDirExists(path);

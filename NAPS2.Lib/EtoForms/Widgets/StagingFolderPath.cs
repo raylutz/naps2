@@ -24,6 +24,16 @@ namespace NAPS2.EtoForms.Widgets
             set => _path.Text = value;
         }
 
+        public bool Enabled 
+        { 
+            get => _path.Enabled;
+            set
+            {
+                _path.Enabled = value;
+                _choose.Enabled = value;
+            } 
+        }
+
         public event EventHandler? TextChanged;
 
         public static implicit operator LayoutElement(StagingFolderPath control)
@@ -51,6 +61,11 @@ namespace NAPS2.EtoForms.Widgets
             {
                 _path.Text = savePath;
             }
+        }
+
+        public void Focus()
+        {
+            _path.Focus();
         }
 
         public StagingFolderPath Visible(LayoutVisibility visibility)

@@ -115,7 +115,6 @@ internal abstract class Placeholders
             // One does, however
             var match = NumberPlaceholderPattern.Match(result);
 
-            result = SubstituteBarcode(filePath, "PatchT");
             if (match.Success)
             {
                 result = NumberPlaceholderPattern.Replace(result, "");
@@ -145,7 +144,7 @@ internal abstract class Placeholders
             return result;
         }
 
-        private string SubstituteBarcode(string path, string barcodeName) 
+        public string SubstituteBarcode(string path, string barcodeName) 
         {
             return path.Replace("$(barcode)", barcodeName);
         }

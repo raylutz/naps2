@@ -275,7 +275,7 @@ public class BatchScanPerformer : IBatchScanPerformer
         }
 
         private async Task Save(Placeholders placeholders, int i, List<ProcessedImage> images)
-        {
+        { 
             if (images.Count == 0)
             {
                 return;
@@ -283,7 +283,7 @@ public class BatchScanPerformer : IBatchScanPerformer
             bool isBatchLog = _patchTSettings.CreatePatchTLog;
             var barcodeName = "";
             if (_config.Get(c => c.PatchTSettings.BarcodeName) != null)            {
-                barcodeName = _config.Get(c => c.PatchTSettings.BarcodeName) + "-";
+                barcodeName = _config.Get(c => c.PatchTSettings.BarcodeName);
             }
 
             var savePath = _settings.SavePath;
@@ -293,9 +293,13 @@ public class BatchScanPerformer : IBatchScanPerformer
             {
                 if (_patchTSettings.SeparatorSheetStartsNewBatch)
                 {
-                    var dirPath = savePath!.Substring(0, savePath.Length - savePath.Substring(savePath.LastIndexOf("\\")).Length);
-                    Directory.CreateDirectory(dirPath + $"\\{_config.Get(c => c.PatchTSettings.BatchName)}{i + 1}");
-                    subPath = subPath.Insert(subPath.LastIndexOf("\\"), $"\\{_config.Get(c => c.PatchTSettings.BatchName)}{i + 1}");
+                    var dirPath = savePath!.Substring(0, savePath.Length - savePath.Substring(savePath.LastIndexOf("\\")).Length + 1);
+                    var batchName = Placeholders.All.Substitute(_config.Get(c => c.PatchTSettings.BatchName), true, i);
+
+                    if (_patchTSettings.SeparatorSheetStartsNewBatch)
+                    {
+
+                    }
                 }
                 if (File.Exists(subPath))
                 {
@@ -321,25 +325,34 @@ public class BatchScanPerformer : IBatchScanPerformer
             {
                 var op = _operationFactory.Create<SaveImagesOperation>();
                 if (_patchTSettings.SeparatorSheetStartsNewBatch) {
-                    var dirPath = savePath!.Substring(0, savePath.Length - savePath.Substring(savePath.LastIndexOf("\\")).Length);
+                    var dirPath = savePath!.Substring(0, savePath.Length - savePath.Substring(savePath.LastIndexOf("\\")).Length + 1);
                     var batchName = Placeholders.All.Substitute(_config.Get(c => c.PatchTSettings.BatchName), true, i);
 
                     if (_patchTSettings.CopyScansToStagingFolder)
                     {
                         // Make staging folder full path
                         var fileName = savePath.Substring(savePath.LastIndexOf("\\") + 1);
-                        var stagingDirPath = _patchTSettings.StagingFolderName!;
-                        stagingDirPath += $"\\{batchName}-{barcodeName}";
+                        var stagingDirPath = $"{_patchTSettings.StagingFolderName!}\\";
+                        stagingDirPath += (_patchTSettings.UseBatchAsFolderName) ? batchName : "";
                         stagingDirPath = Placeholders.All.Substitute(stagingDirPath, true, i) + fileName;
+                        if (_patchTSettings.UseBarcodeAsPlaceholder) {
+                            stagingDirPath = Placeholders.All.SubstituteBarcode(stagingDirPath, barcodeName!);
+                        }
 
                         // Save to the staging folder
                         ProcessedImage[] tempImages = new ProcessedImage[images.Count];
                         for (int j = 0; j < images.Count; j++)
                             tempImages[j] = images[j].Clone();
 
-                        i *= images.Count;
-                        op.Start(stagingDirPath, placeholders, tempImages, _config.Get(c => c.ImageSettings), batch: true, batchLog: isBatchLog, i: i);
-                        bool success = await op.Success;
+                        if (!_patchTSettings.RestartSheetsNumberingPerBatch) {
+                            i *= images.Count;
+                        }
+                        else {
+                            i = 0;
+                        }
+
+                        bool success = op.Start(stagingDirPath, placeholders, tempImages, _config.Get(c => c.ImageSettings), batch: true, batchLog: isBatchLog, i: i);
+                        await op.Success;
 
                         if (success)
                         {
@@ -349,23 +362,34 @@ public class BatchScanPerformer : IBatchScanPerformer
                             }
 
                             // Make a final folder path
-                            dirPath += $"\\{batchName}";
-                            Directory.CreateDirectory(dirPath);
-                            dirPath += $"\\{batchName}-{barcodeName}";
+                            if (_patchTSettings.UseBatchAsFolderName)
+                            {
+                                dirPath += $"\\{batchName}";
+                                Directory.CreateDirectory(dirPath);
+                                dirPath += $"\\{batchName}-";
+                            }
+
                             var finalFolderPath = dirPath + savePath.Substring(savePath.LastIndexOf("\\") + 1);
-                            if (isBatchLog)
+                            if (_patchTSettings.UseBarcodeAsPlaceholder) {
+                                finalFolderPath = Placeholders.All.SubstituteBarcode(finalFolderPath, barcodeName!);
+                            }
+                            if (isBatchLog) {
                                 Log.Info($": BATCH {batchName} Accepting {images.Count} ballots...");
+                            }
 
-                            op.Start(finalFolderPath, placeholders, images, _config.Get(c => c.ImageSettings), batch: true, destFolder: true, batchLog: isBatchLog, i: i);
-                            success = await op.Success;
-                            if (success && isBatchLog)
-                                Log.Info($": Uploaded batch {batchName} to Secondary Path {dirPath.Substring(0, dirPath.Length - dirPath.Substring(dirPath.LastIndexOf("\\")).Length)}");
+                            success = op.Start(finalFolderPath, placeholders, images, _config.Get(c => c.ImageSettings), batch: true, destFolder: true, batchLog: isBatchLog, i: i);
+                            await op.Success;
+                            if (success && isBatchLog) {
+                                Log.Info($": Uploaded batch {batchName} to Secondary Path {dirPath.Substring(0, dirPath.Length - dirPath.Substring(dirPath.LastIndexOf("\\")).Length) + 1}");
+                            }
                         }
-                        else {
-                            if (isBatchLog)
-                                Log.Info("All following files ballots skipped");
+                        else 
+                        {
+                            if (isBatchLog) {
+                                Log.Info("All following ballots were skipped");
+                            }
 
-                            if (_patchTSettings.EraseBatchOnError)
+                            if (_patchTSettings.RestartBatchOnError)
                             {
                                 DirectoryInfo di = new DirectoryInfo(_patchTSettings.StagingFolderName!);
 
@@ -378,13 +402,24 @@ public class BatchScanPerformer : IBatchScanPerformer
                     }
                     else
                     {
-                        dirPath += $"\\{batchName}\\{batchName}-";
-                        subPath = dirPath + $"{barcodeName}" + savePath.Substring(savePath.LastIndexOf("\\") + 1);
+                        dirPath += (_patchTSettings.UseBatchAsFolderName) ? $"{batchName}\\{batchName}-" : "";
+                        subPath = dirPath + savePath.Substring(savePath.LastIndexOf("\\") + 1);
+                        if (_patchTSettings.UseBarcodeAsPlaceholder) {
+                            subPath = Placeholders.All.SubstituteBarcode(subPath, barcodeName!);
+                        }
 
-                        op.Start(subPath, placeholders, images, _config.Get(c => c.ImageSettings), batch: true, batchLog: isBatchLog, i: i);
-                        bool success = await op.Success;
-                        if (success && isBatchLog)
-                            Log.Info($": Uploaded batch {batchName} to Secondary Path {dirPath}");
+                        if (!_patchTSettings.RestartSheetsNumberingPerBatch) {
+                            i *= images.Count;
+                        }
+                        else {
+                            i = 0;
+                        }
+
+                        bool success = op.Start(subPath, placeholders, images, _config.Get(c => c.ImageSettings), batch: true, batchLog: isBatchLog, i: i);
+                        await op.Success;
+                        if (success && isBatchLog) {
+                            Log.Info($": Uploaded batch {batchName} to {dirPath}");
+                        }
                     }
                 }
             }
