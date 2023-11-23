@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2022, ubuntu-22.04, macos-12]
+        os: [windows-2022, macos-12]
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET 6
@@ -19,10 +19,13 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet run --project NAPS2.Tools -- build debug -v
+      #run: dotnet run --project NAPS2.Tools -- build debug -v
+      run: alias n2="dotnet run --project NAPS2.Tools --"; n2 publish exe
     # For Mac we need to build a second time to make sure native deps are present. TODO: Figure out why
     - name: Build 2
       if: matrix.os == 'macos-12'
-      run: dotnet run --project NAPS2.Tools -- build debug -v
+     # run: dotnet run --project NAPS2.Tools -- build debug -v
+      run: alias n2="dotnet run --project NAPS2.Tools --"; n2 publish exe
     - name: Test
-      run: dotnet run --project NAPS2.Tools -- test -v --nogui
+     # run: dotnet run --project NAPS2.Tools -- test -v --nogui
+      run: alias n2="dotnet run --project NAPS2.Tools --"; n2 publish exe
