@@ -268,6 +268,15 @@ namespace NAPS2.Lang.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Auto-incrementing number (4 digits).
+        /// </summary>
+        internal static string AutoIncrementing5Digit {
+            get {
+                return ResourceManager.GetString("AutoIncrementing5Digit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Auto Save Settings.
         /// </summary>
         internal static string AutoSaveSettings {

@@ -16,6 +16,7 @@ internal abstract class Placeholders
     public const string HOUR_24_CLOCK = "$(hh)";
     public const string MINUTE_2_DIGITS = "$(mm)";
     public const string SECOND_2_DIGITS = "$(ss)";
+    public const string NUMBER_5_DIGITS = "$(nnnnn)";
     public const string NUMBER_4_DIGITS = "$(nnnn)";
     public const string NUMBER_3_DIGITS = "$(nnn)";
     public const string NUMBER_2_DIGITS = "$(nn)";

@@ -19,6 +19,7 @@ public class PlaceholdersForm : EtoDialogBase
             (Placeholders.HOUR_24_CLOCK, UiStrings.Hour2Digit),
             (Placeholders.MINUTE_2_DIGITS, UiStrings.Minute2Digit),
             (Placeholders.SECOND_2_DIGITS, UiStrings.Second2Digit),
+            (Placeholders.NUMBER_5_DIGITS, UiStrings.AutoIncrementing5Digit),
             (Placeholders.NUMBER_4_DIGITS, UiStrings.AutoIncrementing4Digit),
             (Placeholders.NUMBER_3_DIGITS, UiStrings.AutoIncrementing3Digit),
             (Placeholders.NUMBER_2_DIGITS, UiStrings.AutoIncrementing2Digit),

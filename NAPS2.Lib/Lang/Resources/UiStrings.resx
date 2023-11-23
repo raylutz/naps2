@@ -849,4 +849,7 @@
   <data name="DefaultBatchName" xml:space="preserve">
     <value>images</value>
   </data>
+  <data name="AutoIncrementing5Digit" xml:space="preserve">
+    <value>Auto-incrementing number (4 digits)</value>
+  </data>
 </root>
