@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2022, ubuntu-22.04, macos-12]
+        os: [windows-2022]
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET 8
@@ -18,7 +18,7 @@ jobs:
       run: dotnet workload install macos
     - name: Install dependencies
       run: dotnet restore
-    - name: Build
+    - name: Build msi package for Windows
       run: dotnet run --project NAPS2.Tools -- publish
     # For Mac we need to build a second time to make sure native deps are present. TODO: Figure out why
     - name: Build 2
