@@ -51,7 +51,7 @@ internal static class SaveSeparatorHelper
                             config.User.Set(c => c.PatchTSettings.BarcodeName, image.PostProcessingData.Barcode.DetectedText);
                     }
 
-                    if (image.PostProcessingData.Barcode.IsPatchT)
+                    if (image.PostProcessingData.Barcode.IsPatchT || image.PostProcessingData.Barcode.DetectedText != null)
                     {
                         if (images.Count > 0)
                         {
