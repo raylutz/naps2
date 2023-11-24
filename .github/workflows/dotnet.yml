@@ -21,8 +21,11 @@ jobs:
     - name: Make n2 alias for Windows
       if: matrix.os == 'windows-2022'
       run: function n2 { dotnet run --project NAPS2.Tools -- $args }
-    - name: Make n2 alias for Macos or Ubuntu
-      if: matrix.os == 'macos-12' | matrix.os == 'ubuntu-22.04'
+    - name: Make n2 alias for Ubuntu
+      if: matrix.os == 'macos-12'
+      run: alias n2="dotnet run --project NAPS2.Tools --"
+    - name: Make n2 alias for Ubuntu
+      if: matrix.os == 'ubuntu-22.04'
       run: alias n2="dotnet run --project NAPS2.Tools --"
     - name: Build
       run: n2 publish exe
