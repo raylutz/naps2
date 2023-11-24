@@ -18,11 +18,17 @@ jobs:
       run: dotnet workload install macos
     - name: Install dependencies
       run: dotnet restore
+    - name: Make n2 alias for Windows
+      if: matrix.os == 'windows-2022'
+      run: function n2 { dotnet run --project NAPS2.Tools -- $args }
+    - name: Make n2 alias for Macos or Ubuntu
+      if: matrix.os == 'macos-12' | matrix.os == 'ubuntu-22.04'
+      run: alias n2="dotnet run --project NAPS2.Tools --"
     - name: Build
-      run: dotnet run --project NAPS2.Tools -- build debug -v
+      run: n2 publish exe
     # For Mac we need to build a second time to make sure native deps are present. TODO: Figure out why
     - name: Build 2
       if: matrix.os == 'macos-12'
-      run: dotnet run --project NAPS2.Tools -- build debug -v
+      run: n2 publish exe
     - name: Test
-      run: dotnet run --project NAPS2.Tools -- test -v --nogui
+      run: n2 test
