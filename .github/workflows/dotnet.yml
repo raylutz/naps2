@@ -20,6 +20,8 @@ jobs:
       run: dotnet restore
     - name: Build msi for Windows
       run: dotnet run --project NAPS2.Tools -- build msi
+    - name: Build sdk
+      run: dotnet run --project NAPS2.Tools -- build sdk
     - name: Build msi package for Windows
       run: dotnet run --project NAPS2.Tools -- pkg msi -p win64
     # For Mac we need to build a second time to make sure native deps are present. TODO: Figure out why
