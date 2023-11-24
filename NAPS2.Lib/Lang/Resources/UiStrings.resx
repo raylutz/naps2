@@ -424,13 +424,13 @@
     <value>Run in Background</value>
   </data>
   <data name="Naps2" xml:space="preserve">
-    <value>NAPS2</value>
+    <value>ScanEngine</value>
   </data>
   <data name="Naps2TitleFormat" xml:space="preserve">
-    <value>NAPS2 - {0}</value>
+    <value>ScanEngine - {0}</value>
   </data>
   <data name="Naps2FullName" xml:space="preserve">
-    <value>Not Another PDF Scanner</value>
+    <value>ScanEngine</value>
   </data>
   <data name="OcrSetupFormTitle" xml:space="preserve">
     <value>OCR Setup</value>
@@ -824,5 +824,46 @@
   </data>
   <data name="ConfirmDeleteSharedDevice" xml:space="preserve">
     <value>Are you sure you want to stop sharing {0}?</value>
+  <data name="BarcodeInfo" xml:space="preserve">
+    <value>Barcode from the separator sheet</value>
+  </data>
+  <data name="CopyToStagingFolder" xml:space="preserve">
+    <value>Copy scans to the staging folder</value>
+  </data>
+  <data name="CreatePatchTLog" xml:space="preserve">
+    <value>Create a log file</value>
+  </data>
+  <data name="EraseBatchOnError" xml:space="preserve">
+    <value>Erase the batch on error</value>
+  </data>
+  <data name="IncludeSeparatorSheet" xml:space="preserve">
+    <value>Include the separator sheet in the batch</value>
+  </data>
+  <data name="RestartBatchOnError" xml:space="preserve">
+    <value>Restart batch on error</value>
+  </data>
+  <data name="RestartSheetsNumbering" xml:space="preserve">
+    <value>Restart numbering of sheets in each batch</value>
+  </data>
+  <data name="SeparatorSheetNewBatch" xml:space="preserve">
+    <value>Separator sheet starts a new batch</value>
+  </data>
+  <data name="UseBarcodePlaceholder" xml:space="preserve">
+    <value>Use code39 barcode as a placeholder for filenames</value>
+  </data>
+  <data name="UseBatchAsFolderName" xml:space="preserve">
+    <value>Use the batch prefix as a folder name for the images</value>
+  </data>
+  <data name="StagingFolderLabel" xml:space="preserve">
+    <value>Staging Folder:</value>
+  </data>
+  <data name="BatchNameLabel" xml:space="preserve">
+    <value>Batch name:</value>
+  </data>
+  <data name="DefaultBatchName" xml:space="preserve">
+    <value>images</value>
+  </data>
+  <data name="AutoIncrementing5Digit" xml:space="preserve">
+    <value>Auto-incrementing number (5 digits)</value>
   </data>
 </root>

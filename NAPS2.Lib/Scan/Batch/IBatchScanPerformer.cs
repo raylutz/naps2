@@ -5,5 +5,5 @@ namespace NAPS2.Scan.Batch;
 
 public interface IBatchScanPerformer
 {
-    Task PerformBatchScan(BatchSettings settings, IFormBase batchForm, Action<ProcessedImage> imageCallback, Action<string> progressCallback, CancellationToken cancelToken);
+    Task PerformBatchScan(BatchSettings settings, PatchTSettings patchTSettings, IFormBase batchForm, Action<ProcessedImage> imageCallback, Action<string> progressCallback, CancellationToken cancelToken);
 }

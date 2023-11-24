@@ -16,12 +16,14 @@ internal abstract class Placeholders
     public const string HOUR_24_CLOCK = "$(hh)";
     public const string MINUTE_2_DIGITS = "$(mm)";
     public const string SECOND_2_DIGITS = "$(ss)";
+    public const string NUMBER_5_DIGITS = "$(nnnnn)";
     public const string NUMBER_4_DIGITS = "$(nnnn)";
     public const string NUMBER_3_DIGITS = "$(nnn)";
     public const string NUMBER_2_DIGITS = "$(nn)";
     public const string NUMBER_1_DIGIT = "$(n)";
     public const string FULL_DATE = "$(YYYY)-$(MM)-$(DD)";
     public const string FULL_TIME = "$(hh)_$(mm)_$(ss)";
+    public const string BARCODE = "$(barcode)";
 
     /// <summary>
     /// Substitutes all the standard placeholders. For example, "$(YYYY)-$(MM)-$(DD) $(hh):$(mm):$(ss)" is substituted with the current date and time. Substitutes environment variables. Handles auto-numbering for multiple files,
@@ -82,7 +84,7 @@ internal abstract class Placeholders
             };
 
         private static readonly Regex NumberPlaceholderPattern = new Regex(@"\$\(n+\)");
-
+         
         private readonly DateTime? _dateTimeOverride;
 
         public DefaultPlaceholders(DateTime? dateTimeOverride = null)
@@ -113,6 +115,7 @@ internal abstract class Placeholders
             result = Replacements.Aggregate(result, (current, ph) => current.Replace(ph.Key, ph.Value(dateTime)));
             // One does, however
             var match = NumberPlaceholderPattern.Match(result);
+
             if (match.Success)
             {
                 result = NumberPlaceholderPattern.Replace(result, "");
@@ -140,6 +143,11 @@ internal abstract class Placeholders
             } while (incrementIfExists && File.Exists(result));
 
             return result;
+        }
+
+        public string SubstituteBarcode(string path, string barcodeName) 
+        {
+            return path.Replace("$(barcode)", barcodeName);
         }
     }
 }

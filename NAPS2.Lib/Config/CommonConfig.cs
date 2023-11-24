@@ -163,6 +163,10 @@ public class CommonConfig
 
     [Config]
     [Common]
+    public PatchTSettings PatchTSettings { get; set; } = new();
+
+    [Config]
+    [Common]
     public KeyboardShortcuts KeyboardShortcuts { get; set; } = new();
 
     [Common]
