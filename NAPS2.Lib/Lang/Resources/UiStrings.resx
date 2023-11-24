@@ -824,6 +824,7 @@
   </data>
   <data name="ConfirmDeleteSharedDevice" xml:space="preserve">
     <value>Are you sure you want to stop sharing {0}?</value>
+  </data>
   <data name="BarcodeInfo" xml:space="preserve">
     <value>Barcode from the separator sheet</value>
   </data>
