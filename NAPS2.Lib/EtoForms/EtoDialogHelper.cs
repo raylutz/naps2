@@ -134,27 +134,23 @@ public class EtoDialogHelper : DialogHelper
 
     public override bool PromptToSelectFolder(string? folderPath, out string? savePath)
     {
-        if (EtoPlatform.Current.IsWinForms)
-        {
-            var selectFolderDialog = new System.Windows.Forms.FolderBrowserDialog();
+#if OS_WINDOWS
+        var selectFolderDialog = new System.Windows.Forms.FolderBrowserDialog();
 
-            if (selectFolderDialog.ShowDialog(null) == System.Windows.Forms.DialogResult.OK)
-            {
+        if (selectFolderDialog.ShowDialog(null) == System.Windows.Forms.DialogResult.OK)
+        {
                 savePath = selectFolderDialog.SelectedPath;
                 return true;
-            }
         }
-        else
+#elif OS_LINUX || OS_MAC
+        var selectFolderDialog = new SelectFolderDialog();
+
+        if (selectFolderDialog.ShowDialog(null) == DialogResult.Ok)
         {
-            var selectFolderDialog = new SelectFolderDialog();
-
-            if (selectFolderDialog.ShowDialog(null) == DialogResult.Ok)
-            {
-                savePath = selectFolderDialog.Directory;
-                return true;
-            }
+            savePath = selectFolderDialog.Directory;
+            return true;
         }
-
+#endif
         savePath = null;
         return false;
     }
