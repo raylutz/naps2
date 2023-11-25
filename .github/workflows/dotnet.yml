@@ -22,8 +22,8 @@ jobs:
       run: dotnet run --project NAPS2.Tools -- clean
     - name: Build Release
       run: dotnet run --project NAPS2.Tools -- build release
-    - name: Remove publish dir
-      run: rm D:\a\naps2\naps2\NAPS2.Setup\publish -r -force
+    - name: Ls files in NAPS2.Setup
+      run: ls D:\a\naps2\naps2\NAPS2.Setup
     - name: Create installer for Windows
       run: dotnet run --project NAPS2.Tools -- pkg exe
     - name: List files
