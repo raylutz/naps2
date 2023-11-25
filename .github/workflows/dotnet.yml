@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2022]
+        os: [windows-2022, macos-12]
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET 8
@@ -18,19 +18,11 @@ jobs:
       run: dotnet workload install macos
     - name: Install dependencies
       run: dotnet restore
-    - name: Clean the project
-      run: dotnet run --project NAPS2.Tools -- clean
-    - name: Build Release
-      run: dotnet run --project NAPS2.Tools -- build release
-    - name: Ls files in NAPS2.Setup
-      run: ls D:\a\naps2\naps2\NAPS2.Setup
-    - name: Create installer for Windows
-      run: dotnet run --project NAPS2.Tools -- pkg exe
-    - name: List files
-      run: ls
+    - name: Build
+      run: dotnet run --project NAPS2.Tools -- build debug -v
     # For Mac we need to build a second time to make sure native deps are present. TODO: Figure out why
     - name: Build 2
       if: matrix.os == 'macos-12'
-      run: dotnet run --project NAPS2.Tools -- build release
+      run: dotnet run --project NAPS2.Tools -- build debug -v
     - name: Test
       run: dotnet run --project NAPS2.Tools -- test -v --nogui
