@@ -16,7 +16,6 @@ internal class SaveImagesOperation : OperationBase
     }
 
     public string? FirstFileSaved { get; private set; }
-    private bool _destFolder = false;
     private bool _isBatchLog = false;
 
     /// <summary>
@@ -30,9 +29,8 @@ internal class SaveImagesOperation : OperationBase
     /// <param name="batch"></param>
     /// <param name="imageSettings"></param>
     public bool Start(string fileName, Placeholders placeholders, IList<ProcessedImage> images,
-        ImageSettings imageSettings, string? overwriteFile = null, bool batch = false, bool destFolder = false, bool batchLog = false, int i = 0)
+        ImageSettings imageSettings, string? overwriteFile = null, bool batch = false, bool batchLog = false, int i = 0)
     {
-        _destFolder = destFolder;
         _isBatchLog = batchLog;
         Status = new OperationStatus
         {
@@ -170,15 +168,12 @@ internal class SaveImagesOperation : OperationBase
                 imageSettings.TiffCompression.ToTiffCompressionType(), CancelToken);
             if (_isBatchLog)
             {
-                if (!_destFolder)
+                if (status)
+                    Log.Info($": Ballot {Path.GetFileName(path)}: {status}");
+                else
                 {
-                    if (status)
-                        Log.Info($": Ballot {path.Substring(path.LastIndexOf("\\") + 1)}: {status}");
-                    else
-                    {
-                        Log.Info($": Ballot {path.Substring(path.LastIndexOf("\\") + 1)}:        - Problem Ballot - Skipped");
-                        Log.Info($"Stopped on ballot {path.Substring(path.LastIndexOf("\\") + 1)}. Ballot misread.");
-                    }
+                    Log.Info($": Ballot {Path.GetFileName(path)}:        - Problem Ballot - Skipped");
+                    Log.Info($"Stopped on ballot {Path.GetFileName(path)}. Ballot misread.");
                 }
             }
         }

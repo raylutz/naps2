@@ -50,17 +50,17 @@ public class BatchScanForm : EtoDialogBase
     private readonly RadioButton _separateByPatchT;
     private readonly CheckBox _separatorSheetNewBatch;
     private readonly CheckBox _includeSeparatorSheet;
-   // private readonly CheckBox _useBarcodePlaceholder;
     private readonly CheckBox _restartSheetsNumbering;
     private readonly CheckBox _restartBatchOnError;
     private readonly CheckBox _copyToStagingFolder;
-    // private readonly CheckBox _eraseBatchOnError;
     private readonly CheckBox _useBatchAsFolderName;
     private readonly CheckBox _createBatchLog;
     private readonly LinkButton _moreInfo = C.UrlLink(PATCH_CODE_INFO_URL, UiStrings.MoreInfo);
     private readonly LayoutVisibility _stagingFolderPathVis = new(false);
     private readonly LayoutVisibility _fileVis = new(false);
+    private readonly LayoutVisibility _batchLogFolderPathVis = new(false);
     private readonly StagingFolderPath _stagingFolderPath;
+    private readonly StagingFolderPath _batchLogFolderPath;
     private readonly FilePathWithPlaceholders _filePath;
 
     private readonly TransactionConfigScope<CommonConfig> _userTransact;
@@ -86,14 +86,13 @@ public class BatchScanForm : EtoDialogBase
         _separateByPatchT = new RadioButton(_filePerScan) { Text = UiStrings.SeparateByPatchT, Checked = true };
         _separatorSheetNewBatch = new CheckBox() { Text = UiStrings.SeparatorSheetNewBatch };
         _includeSeparatorSheet = new CheckBox() { Text = UiStrings.IncludeSeparatorSheet };
-      //  _useBarcodePlaceholder = new CheckBox() { Text = UiStrings.UseBarcodePlaceholder };
         _restartSheetsNumbering = new CheckBox() { Text = UiStrings.RestartSheetsNumbering };
         _restartBatchOnError = new CheckBox() { Text = UiStrings.RestartBatchOnError, Checked = true };
         _copyToStagingFolder = new CheckBox() { Text = UiStrings.CopyToStagingFolder, Checked = true };
-      //  _eraseBatchOnError = new CheckBox() { Text = UiStrings.EraseBatchOnError };
         _useBatchAsFolderName = new CheckBox() { Text = UiStrings.UseBatchAsFolderName };
         _createBatchLog = new CheckBox() { Text = UiStrings.CreatePatchTLog };
         _stagingFolderPath = new(dialogHelper);
+        _batchLogFolderPath = new(dialogHelper);
         _filePath = new(this, dialogHelper);
 
         _start.Click += Start;
@@ -105,6 +104,7 @@ public class BatchScanForm : EtoDialogBase
         _separatorSheetNewBatch.CheckedChanged += UpdateVisibility;
         _restartBatchOnError.CheckedChanged += UpdateVisibility;
         _copyToStagingFolder.CheckedChanged += UpdateVisibility;
+        _createBatchLog.CheckedChanged += UpdateVisibility;
 
         _userTransact = Config.User.BeginTransaction();
         _transactionConfig = Config.WithTransaction(_userTransact);
@@ -123,6 +123,7 @@ public class BatchScanForm : EtoDialogBase
         _delayVis.IsVisible = _multipleScansDelay.Checked;
         _multiVis.IsVisible = _saveToMultipleFiles.Checked;
         _stagingFolderPathVis.IsVisible = (bool)_copyToStagingFolder.Checked!;
+        _batchLogFolderPathVis.IsVisible = (bool)_createBatchLog.Checked!;
         _fileVis.IsVisible = _saveToSingleFile.Checked || _saveToMultipleFiles.Checked;
         LayoutController.Invalidate();
     }
@@ -184,7 +185,7 @@ public class BatchScanForm : EtoDialogBase
                         _separateByPatchT,
                         L.Column(
                             _separatorSheetNewBatch,
-                            L.Column (
+                            L.Column(
                                 _includeSeparatorSheet,
                                 _useBatchAsFolderName,
                                 _restartSheetsNumbering,
@@ -192,13 +193,16 @@ public class BatchScanForm : EtoDialogBase
                                     L.Column(
                                      _copyToStagingFolder,
                                       L.Column(
-                                  //      _eraseBatchOnError,
+                                        //      _eraseBatchOnError,
                                         C.Label(UiStrings.StagingFolderLabel),
                                         _stagingFolderPath
                                     ).Padding(left: 20).Visible(_copyToStagingFolderVis)
                                 ).Padding(left: 20).Visible(_restartBatchOnErrorVis),
-                           //     _useBarcodePlaceholder,
-                                _createBatchLog
+                                //     _useBarcodePlaceholder,
+                                _createBatchLog,
+                                L.Column(
+                                    _batchLogFolderPath
+                                ).Visible(_batchLogFolderPathVis)
                             ).Padding(left: 20).Visible(_separatorSheetNewBatchVis)
                         ).Padding(left: 20).Visible(_patchTVis),
                         _moreInfo
@@ -240,11 +244,9 @@ public class BatchScanForm : EtoDialogBase
         _separateByPatchT.Checked = _transactionConfig.Get(c => c.BatchSettings.SaveSeparator) == SaveSeparator.PatchT;
         _separatorSheetNewBatch.Checked = _transactionConfig.Get(c => c.PatchTSettings.SeparatorSheetStartsNewBatch) == true;
         _includeSeparatorSheet.Checked = _transactionConfig.Get(c => c.PatchTSettings.IncludeSeparatorInBatch) == true;
-     //   _useBarcodePlaceholder.Checked = _transactionConfig.Get(c => c.PatchTSettings.UseBarcodeAsPlaceholder) == true;
         _restartSheetsNumbering.Checked = _transactionConfig.Get(c => c.PatchTSettings.RestartSheetsNumberingPerBatch) == true;
         _restartBatchOnError.Checked = _transactionConfig.Get(c => c.PatchTSettings.RestartBatchOnError) == true;
         _copyToStagingFolder.Checked = _transactionConfig.Get(c => c.PatchTSettings.CopyScansToStagingFolder) == true;
-     //   _eraseBatchOnError.Checked = _transactionConfig.Get(c => c.PatchTSettings.EraseBatchOnError) == true;
         _useBatchAsFolderName.Checked = _transactionConfig.Get(c => c.PatchTSettings.UseBatchAsFolderName) == true;
         _createBatchLog.Checked = _transactionConfig.Get(c => c.PatchTSettings.CreatePatchTLog) == true;
 
@@ -295,19 +297,18 @@ public class BatchScanForm : EtoDialogBase
             : _separateByPatchT.Checked ? SaveSeparator.PatchT
             : SaveSeparator.FilePerPage);
 
-        // New features
         _userTransact.Set(c => c.ImageSettings.SinglePageTiff, _separateByPatchT.Checked ? true : false);
 
         _userTransact.Set(c => c.PatchTSettings.SeparatorSheetStartsNewBatch, _separateByPatchT.Checked && _separateByPatchT.Checked ? true : false);
         _userTransact.Set(c => c.PatchTSettings.IncludeSeparatorInBatch, (bool)_includeSeparatorSheet.Checked! && _separateByPatchT.Checked ? true : false);
-       // _userTransact.Set(c => c.PatchTSettings.UseBarcodeAsPlaceholder, (bool)_useBarcodePlaceholder.Checked! ? true : false);
         _userTransact.Set(c => c.PatchTSettings.RestartSheetsNumberingPerBatch, (bool)_restartSheetsNumbering.Checked! && _separateByPatchT.Checked ? true : false);
         _userTransact.Set(c => c.PatchTSettings.RestartBatchOnError, (bool)_restartBatchOnError.Checked! && _separateByPatchT.Checked ? true : false);
         _userTransact.Set(c => c.PatchTSettings.CopyScansToStagingFolder, (bool)_copyToStagingFolder.Checked! && (bool)_copyToStagingFolder.Checked! && _separateByPatchT.Checked ? true : false);
-      //  _userTransact.Set(c => c.PatchTSettings.EraseBatchOnError, (bool)_eraseBatchOnError.Checked! ? true : false);
         _userTransact.Set(c => c.PatchTSettings.UseBatchAsFolderName, (bool)_useBatchAsFolderName.Checked! && _separateByPatchT.Checked ? true : false);
         _userTransact.Set(c => c.PatchTSettings.CreatePatchTLog, (bool)_createBatchLog.Checked! && _separateByPatchT.Checked ? true : false);
         _userTransact.Set(c => c.PatchTSettings.StagingFolderName, _stagingFolderPath.Text);
+        // ToDo: Make it without folder selection
+        _userTransact.Set(c => c.PatchTSettings.BatchLogPath, _batchLogFolderPath.Text + "\\batchlog.txt");
 
         _userTransact.Set(c => c.BatchSettings.SavePath, _filePath.Text);
         if (_transactionConfig.Get(c => c.BatchSettings.OutputType) != BatchOutputType.Load &&
@@ -322,6 +323,13 @@ public class BatchScanForm : EtoDialogBase
         {
             ok = false;
             _stagingFolderPath.Focus();
+        }
+
+        if (_transactionConfig.Get(c => c.PatchTSettings.CreatePatchTLog) &&
+            string.IsNullOrWhiteSpace(_transactionConfig.Get(c => c.PatchTSettings.BatchLogPath)))
+        {
+            ok = false;
+            _batchLogFolderPath.Focus();
         }
 
         return ok;
@@ -421,8 +429,8 @@ public class BatchScanForm : EtoDialogBase
         {
             _profile, _singleScan, _multipleScansPrompt, _multipleScansDelay, _numberOfScans,
             _timeBetweenScans, _load, _saveToSingleFile, _saveToMultipleFiles, _filePerScan, _filePerPage,
-            _separateByPatchT, _separatorSheetNewBatch, _includeSeparatorSheet, // _useBarcodePlaceholder,
-            _restartSheetsNumbering, _restartBatchOnError, _copyToStagingFolder, //_eraseBatchOnError,
+            _separateByPatchT, _separatorSheetNewBatch, _includeSeparatorSheet,
+            _restartSheetsNumbering, _restartBatchOnError, _copyToStagingFolder,
             _useBatchAsFolderName, _createBatchLog, _moreInfo
         };
         foreach (var control in controls)

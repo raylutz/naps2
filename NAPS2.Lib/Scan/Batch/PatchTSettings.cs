@@ -26,5 +26,7 @@ namespace NAPS2.Scan.Batch
         public bool UseBatchAsFolderName { get; set; }
 
         public bool CreatePatchTLog { get; set; }
+
+        public string? BatchLogPath { get; set; }
     }
 }

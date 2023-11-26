@@ -31,14 +31,15 @@ public static class NLogConfig
         };
         var batchTarget = new FileTarget
         {
-            FileName = Path.Combine(Paths.AppData, "batchlog.txt"),
+            FileName = Path.Combine(Paths.AppData, "batchlog.txt", "${event-properties:item=myLogName}"),
             Layout = "${longdate} ${processid} ${message} ${exception:format=tostring}",
             ArchiveAboveSize = 100000,
             MaxArchiveFiles = 1
         };
-       // config.AddTarget("errorlogfile", target);
+        config.AddTarget("errorlogfile", target);
         config.AddTarget("debuglogfile", debugTarget);
         config.AddTarget("batchlogfile", batchTarget);
+        config.AddRule(LogLevel.Trace, LogLevel.Info, batchTarget);
         config.LoggingRules.Add(new LoggingRule("*", LogLevel.Error, target));
         config.LoggingRules.Add(new LoggingRule("*", LogLevel.Info, batchTarget));
         var debugRule = new LoggingRule("*", LogLevel.Debug, debugTarget);
