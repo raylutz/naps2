@@ -19,7 +19,11 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet run --project NAPS2.Tools -- build debug -v
+      run: dotnet run --project NAPS2.Tools -- build release
+    - name: Build NAPS2.Setup
+      run: dotnet build NAPS2.Setup
+    - name: Produce executable 
+      run: dotnet run --project NAPS2.Tools -- pkg exe
     # For Mac we need to build a second time to make sure native deps are present. TODO: Figure out why
     - name: Build 2
       if: matrix.os == 'macos-12'
